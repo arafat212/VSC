@@ -1,0 +1,225 @@
+<!-- Add this in your video_player.html file, preferably in the script section -->
+
+<script>
+// Keyboard shortcuts for video player
+const shortcuts = {{ shortcuts_json|safe }};
+
+document.addEventListener('keydown', function(e) {
+    // Don't trigger if user is typing in an input field
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+    }
+    
+    const key = getKeyCombination(e);
+    const action = getActionForKey(key);
+    
+    if (action) {
+        e.preventDefault();
+        executeAction(action);
+    }
+});
+
+function getKeyCombination(e) {
+    const keys = [];
+    
+    if (e.ctrlKey) keys.push('Ctrl');
+    if (e.metaKey) keys.push('Cmd');
+    if (e.shiftKey) keys.push('Shift');
+    if (e.altKey) keys.push('Alt');
+    
+    // Add main key
+    const mainKey = formatKey(e.key);
+    if (mainKey && !keys.includes(mainKey)) {
+        keys.push(mainKey);
+    }
+    
+    return keys.join('+');
+}
+
+function formatKey(key) {
+    const keyMap = {
+        ' ': 'Space',
+        'ArrowUp': 'Up',
+        'ArrowDown': 'Down',
+        'ArrowLeft': 'Left',
+        'ArrowRight': 'Right',
+        'Escape': 'Esc'
+    };
+    
+    return keyMap[key] || (key.length === 1 ? key.toUpperCase() : key);
+}
+
+function getActionForKey(keyCombo) {
+    for (const [action, data] of Object.entries(shortcuts)) {
+        if (data.key === keyCombo) {
+            return action;
+        }
+    }
+    return null;
+}
+
+function executeAction(action) {
+    const video = document.getElementById('video-player');
+    
+    switch(action) {
+        case 'play_pause':
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+            break;
+            
+        case 'increase_speed':
+            video.playbackRate = Math.min(video.playbackRate + 0.25, 4.0);
+            showShortcutFeedback(`Speed: ${video.playbackRate.toFixed(2)}x`);
+            break;
+            
+        case 'decrease_speed':
+            video.playbackRate = Math.max(video.playbackRate - 0.25, 0.25);
+            showShortcutFeedback(`Speed: ${video.playbackRate.toFixed(2)}x`);
+            break;
+            
+        case 'fullscreen':
+            toggleFullscreen();
+            break;
+            
+        case 'mute':
+            video.muted = !video.muted;
+            showShortcutFeedback(video.muted ? 'Muted' : 'Unmuted');
+            break;
+            
+        case 'volume_up':
+            video.volume = Math.min(video.volume + 0.1, 1.0);
+            showShortcutFeedback(`Volume: ${Math.round(video.volume * 100)}%`);
+            break;
+            
+        case 'volume_down':
+            video.volume = Math.max(video.volume - 0.1, 0.0);
+            showShortcutFeedback(`Volume: ${Math.round(video.volume * 100)}%`);
+            break;
+            
+        case 'seek_forward':
+            video.currentTime += 5;
+            showShortcutFeedback('Seek +5s');
+            break;
+            
+        case 'seek_backward':
+            video.currentTime -= 5;
+            showShortcutFeedback('Seek -5s');
+            break;
+            
+        case 'next_video':
+            // Implement next video logic
+            break;
+            
+        case 'previous_video':
+            // Implement previous video logic
+            break;
+    }
+}
+
+function showShortcutFeedback(message) {
+    // Create or update feedback element
+    let feedback = document.getElementById('shortcut-feedback');
+    if (!feedback) {
+        feedback = document.createElement('div');
+        feedback.id = 'shortcut-feedback';
+        feedback.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 10000;
+            font-size: 14px;
+            transition: opacity 0.3s;
+        `;
+        document.body.appendChild(feedback);
+    }
+    
+    feedback.textContent = message;
+    feedback.style.opacity = '1';
+    
+    // Hide after 2 seconds
+    setTimeout(() => {
+        feedback.style.opacity = '0';
+    }, 2000);
+}
+
+function toggleFullscreen() {
+    const elem = document.documentElement;
+    if (!document.fullscreenElement) {
+        elem.requestFullscreen().catch(err => {
+            console.log(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+// Show available shortcuts on Ctrl+? or Cmd+?
+document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === '?') {
+        e.preventDefault();
+        showShortcutsHelp();
+    }
+});
+
+function showShortcutsHelp() {
+    // Create help modal
+    const modalHtml = `
+        <div class="modal fade" id="shortcutsHelpModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fas fa-keyboard me-2"></i>Keyboard Shortcuts</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Action</th>
+                                        <th>Shortcut</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${Object.entries(shortcuts).map(([action, data]) => `
+                                        <tr>
+                                            <td>${action.replace(/_/g, ' ').toUpperCase()}</td>
+                                            <td><kbd>${data.key}</kbd></td>
+                                            <td>${data.description}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Press <kbd>Esc</kbd> to close this dialog
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing modal if any
+    const existingModal = document.getElementById('shortcutsHelpModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Add new modal to body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('shortcutsHelpModal'));
+    modal.show();
+}
+</script>
