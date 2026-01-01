@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Speed Controller</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="popup-container">
+        <div class="header">
+            <h1 data-i18n="title">Video Speed Control</h1>
+            <div class="status-indicator">
+                <span class="status-dot" id="statusDot"></span>
+                <span data-i18n="status" id="statusText">Active</span>
+            </div>
+        </div>
+        
+        <div class="speed-display">
+            <div class="current-speed" id="currentSpeed">1.0x</div>
+            <div class="speed-label" data-i18n="current_speed">Current Speed</div>
+        </div>
+        
+        <div class="speed-controls">
+            <button class="speed-btn decrease" id="decreaseSpeed" data-i18n="decrease">Decrease (-)</button>
+            <button class="speed-btn reset" id="resetSpeed" data-i18n="reset">Reset (1.0x)</button>
+            <button class="speed-btn increase" id="increaseSpeed" data-i18n="increase">Increase (+)</button>
+        </div>
+        
+        <div class="preset-speeds">
+            <h3 data-i18n="presets">Preset Speeds</h3>
+            <div class="preset-grid">
+                <button class="preset-btn" data-speed="0.25">0.25x</button>
+                <button class="preset-btn" data-speed="0.5">0.5x</button>
+                <button class="preset-btn" data-speed="0.75">0.75x</button>
+                <button class="preset-btn" data-speed="1.25">1.25x</button>
+                <button class="preset-btn" data-speed="1.5">1.5x</button>
+                <button class="preset-btn" data-speed="2">2x</button>
+                <button class="preset-btn" data-speed="3">3x</button>
+                <button class="preset-btn" data-speed="5">5x</button>
+                <button class="preset-btn" data-speed="10">10x</button>
+            </div>
+        </div>
+        
+        <div class="custom-speed">
+            <h3 data-i18n="custom_speed">Custom Speed</h3>
+            <div class="custom-control">
+                <input type="range" id="speedSlider" min="0.1" max="10" step="0.1" value="1.0">
+                <input type="number" id="speedInput" min="0.1" max="10" step="0.1" value="1.0">
+                <button id="setCustomSpeed" data-i18n="set">Set</button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <button id="toggleExtension" class="toggle-btn" data-i18n="disable_extension">Disable Extension</button>
+            <div class="footer-links">
+                <button id="openOptions" data-i18n="settings">Settings</button>
+                <button id="shortcutHelp" data-i18n="shortcuts">Shortcuts</button>
+            </div>
+        </div>
+        
+        <div class="author" data-i18n="developed_by">Developed by Arafat Rahman</div>
+    </div>
+    
+    <div id="shortcutModal" class="modal">
+        <div class="modal-content">
+            <h2 data-i18n="keyboard_shortcuts">Keyboard Shortcuts</h2>
+            <div class="shortcut-list">
+                <div class="shortcut-item">
+                    <span class="key">Ctrl+Shift+↑</span>
+                    <span data-i18n="increase_speed_desc">Increase speed</span>
+                </div>
+                <div class="shortcut-item">
+                    <span class="key">Ctrl+Shift+↓</span>
+                    <span data-i18n="decrease_speed_desc">Decrease speed</span>
+                </div>
+                <div class="shortcut-item">
+                    <span class="key">Ctrl+Shift+0</span>
+                    <span data-i18n="reset_speed_desc">Reset to 1.0x</span>
+                </div>
+                <div class="shortcut-item">
+                    <span class="key">Ctrl+Shift+E</span>
+                    <span data-i18n="toggle_extension_desc">Toggle extension</span>
+                </div>
+                <div class="shortcut-item">
+                    <span class="key">Ctrl+Shift+1</span>
+                    <span data-i18n="custom_speed_1_desc">Custom speed 1</span>
+                </div>
+                <div class="shortcut-item">
+                    <span class="key">Ctrl+Shift+2</span>
+                    <span data-i18n="custom_speed_2_desc">Custom speed 2</span>
+                </div>
+            </div>
+            <button id="closeModal" class="modal-close" data-i18n="close">Close</button>
+        </div>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>
